@@ -38,6 +38,6 @@ res = {}
 if len(sys.argv) == 3:
     res = requests.get(f"http://{sys.argv[1]}:{sys.argv[2]}").json()
 else:
-    res = requests.get(f"http://{sys.argv[1]}:11297").json()
+    res = requests.get(f"http://{sys.argv[1]}:11927").json()
 
 api.run(res)
