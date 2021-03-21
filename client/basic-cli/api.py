@@ -22,36 +22,24 @@
 
 import sys
 
-from flask import Flask
 
-import result
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def global_pull():
-    stats = result.Result()
-    # instead of forming res here, just return it directly?
-    res = {
-        "api": stats.api,
-        "cpu": stats.cpu,
-        "mem": stats.mem,
-        "disk": stats.disk
+def run(res: dict):
+    if "api" not in res.keys():
+        print(f"{sys.argv[0]}: error: malformed response:\n{res}")
+    versions = {
+        "1": v1
     }
-    return res
+    versions[str(res["api"])](res)
 
 
-if __name__ == '__main__':
-    if "help" in sys.argv:
-        print(f"'{sys.argv[0]} help' for help\n"
-              f"'{sys.argv[0]} int' to run internally\n"
-              f"'{sys.argv[0]} port <NUM>' to run on non-std port\n"
-              f"'{sys.argv[0]} int port <NUM> to run internally on non-std port")
-    host = "0.0.0.0"
-    port = 11927
-    if "int" in sys.argv:
-        host = "127.0.0.1"
-    if "port" in sys.argv:
-        port = sys.argv[sys.argv.index("port") + 1]
-    app.run(host=host, port=port)
+def v1(res: dict):
+    print(f"API version: {res['api']}\n"
+          f"CPU load 1m: {res['cpu']['load_1m']}\n"
+          f"CPU load 5m: {res['cpu']['load_5m']}\n"
+          f"CPU load 15m: {res['cpu']['load_15m']}\n"
+          f"Logical processors: {res['cpu']['nproc']}\n"
+          f"CPU estimated usage: {res['cpu']['sys']}\n"
+          f"Total memory (bytes): {res['mem']['total']}\n"
+          f"Available memory (bytes): {res['mem']['available']}\n"
+          f"Root disk size: {res['disk']['rsize']}\n"
+          f"Root disk used: {res['disk']['rused']}")

@@ -22,36 +22,22 @@
 
 import sys
 
-from flask import Flask
+import requests
 
-import result
+import api
 
-app = Flask(__name__)
+if len(sys.argv) < 2:
+    print(f"{sys.argv[0]}: error: you must provide a host, add -h for help")
+    sys.exit(1)
 
+if "-h" in sys.argv:
+    print(f"run '{sys.argv[0]} <HOST>' to check a host")
+    sys.exit(1)
 
-@app.route('/')
-def global_pull():
-    stats = result.Result()
-    # instead of forming res here, just return it directly?
-    res = {
-        "api": stats.api,
-        "cpu": stats.cpu,
-        "mem": stats.mem,
-        "disk": stats.disk
-    }
-    return res
+res = {}
+if len(sys.argv) == 3:
+    res = requests.get(f"http://{sys.argv[1]}:{sys.argv[2]}").json()
+else:
+    res = requests.get(f"http://{sys.argv[1]}:11297").json()
 
-
-if __name__ == '__main__':
-    if "help" in sys.argv:
-        print(f"'{sys.argv[0]} help' for help\n"
-              f"'{sys.argv[0]} int' to run internally\n"
-              f"'{sys.argv[0]} port <NUM>' to run on non-std port\n"
-              f"'{sys.argv[0]} int port <NUM> to run internally on non-std port")
-    host = "0.0.0.0"
-    port = 11927
-    if "int" in sys.argv:
-        host = "127.0.0.1"
-    if "port" in sys.argv:
-        port = sys.argv[sys.argv.index("port") + 1]
-    app.run(host=host, port=port)
+api.run(res)
