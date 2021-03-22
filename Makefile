@@ -20,18 +20,18 @@
 # the Free Software Foundation to receive a copy of the License by mail.
 #
 
-# todo: pyoxidizer?
-# pyinstaller: make
-https://github.com/pyinstaller/pyinstaller/archive/develop.zip
+all: deps server-basic-flask client-basic-cli
 
-# Flask: server/basic-flask
-Flask
+deps:
+	if [ ! -f "./venv" ]; then python3 -m venv venv; fi
+	pip3 install -r requirements.txt
 
-# simplejson: None (TBU)
-simplejson
+server: server-basic-flask
 
-# psutil: server/basic-flask
-psutil
+client: client-basic-cli
 
-# requests: client/basic-cli
-requests
+server-basic-flask: deps
+	pyinstaller -F server/basic-flask/main.py -n statdis-server-basic-flask
+
+client-basic-cli: deps
+	pyinstaller -F client/basic-cli/main.py -n statdis-client-basic-cli
