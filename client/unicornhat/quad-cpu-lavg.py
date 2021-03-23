@@ -25,31 +25,42 @@ import time
 import requests
 import unicornhat
 
-def run(host: str, brightness: float):
+def run(hosts: list, brightness: float):
     unicornhat.set_all(0, 0, 0)
     unicornhat.brightness(brightness)
     unicornhat.show()
     alive = True
     while alive:
         try:
-            res = requests.get(f"http://{host}").json()
-            util = res["cpu"]["load_1m"] / res["cpu"]["nproc"]
-            red = (0 + util) * 255
-            green = (1 - util) * 255
-            unicornhat.set_all(int(red), int(green), 0)
-            unicornhat.show()
-            time.sleep(0.5)
+            util = [{}, {}, {}, {}]
+            for x in range(4):
+                res = requests.get(f"http://{hosts[x]}").json()
+                util[x] = {
+                    "id": x,
+                    "util": res["cpu"]["load_1m"] / res["cpu"]["nproc"]
+                }
+            for x in util:
+                update_quadrant(x["util"], x["id"])
         except KeyboardInterrupt:
             alive = False
+        time.sleep(0.5)
     unicornhat.off()
 
+def update_quadrant(util: float, qn: int):
+    bx = (qn & 2) * 2
+    by = (qn & 1) * 4
+    r = int((0 + util) * 255)
+    g = int((1 - util) * 255)
+    for ax in range(4):
+        for ay in range(4):
+            unicornhat.set_pixel(ax + bx, ay + by, r, g, 0)
+    unicornhat.show()
 
-if len(sys.argv) < 2:
-    print("error: you must provide a host")
-    sys.exit(1)
+if len(sys.argv) < 5:
+    print("error: please provide at least 5 hosts")
 
 brightness = 0.5
-if len(sys.argv) == 3:
-    brightness = float(sys.argv[2])
+if len(sys.argv) == 6:
+    brightness = float(sys.argv[5])
 
-run(sys.argv[1], brightness)
+run(sys.argv[1:5], brightness)
