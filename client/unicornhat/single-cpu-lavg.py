@@ -19,22 +19,36 @@
 # You can also contact the creator of this program for the address of
 # the Free Software Foundation to receive a copy of the License by mail.
 #
+import sys
+import time
 
-# todo: pyoxidizer?
-# pyinstaller: make
-https://github.com/pyinstaller/pyinstaller/archive/develop.zip
+import requests
+import unicornhat
 
-# Flask: server/basic-flask
-Flask
+def run(host: str, brightness: float):
+    unicornhat.set_all(0, 0, 0)
+    unicornhat.brightness(brightness)
+    unicornhat.show()
+    alive = True
+    while alive:
+        try:
+            res = requests.get(f"http://{host}").json()
+            util = res["load_1m"] / res["nproc"]
+            red = (0 + util) * 255
+            green = (1 - util) * 255
+            unicornhat.set_all(int(red), int(green), 0)
+            unicornhat.show()
+            time.sleep(0.5)
+        except KeyboardInterrupt:
+            alive = False
 
-# simplejson: None (TBU)
-simplejson
 
-# psutil: server/basic-flask
-psutil
+if len(sys.argv) < 2:
+    print("error: you must provide a host")
+    sys.exit(1)
 
-# requests: client/basic-cli
-requests
+brightness = 0.5
+if len(sys.argv) == 3:
+    brightness = float(sys.argv[2])
 
-# unicornhat: client/unicornhat
-unicornhat
+run(sys.argv[1], brightness)
