@@ -20,11 +20,11 @@
 # the Free Software Foundation to receive a copy of the License by mail.
 #
 
-all: deps server-basic-flask client-basic-cli
+all: deps server-basic-flask client-basic-cli client-unicornhat-single-cpu-lavg client-unicornhat-quad-cpu-lavg
 
-install: ensure-root server-basic-flask-install client-basic-cli-install
+install: ensure-root server-basic-flask-install client-basic-cli-install client-unicornhat-single-cpu-lavg-install client-unicornhat-quad-cpu-lavg-install
 
-uninstall: ensure-root server-basic-flask-uninstall client-basic-cli-uninstall
+uninstall: ensure-root server-basic-flask-uninstall client-basic-cli-uninstall client-unicornhat-single-cpu-lavg-uninstall client-unicornhat-quad-cpu-lavg-uninstall
 
 deps:
 	if [ ! -f "./venv" ]; then python3 -m venv venv; fi
@@ -51,14 +51,32 @@ server-basic-flask: deps
 client-basic-cli: deps
 	pyinstaller -F client/basic-cli/main.py -n statdis-client-basic-cli
 
+client-unicornhat-single-cpu-lavg: deps
+	pyinstaller -F client/unicornhat/single-cpu-lavg.py -n statdis-client-unicornhat-single-cpu-lavg
+
+client-unicornhat-quad-cpu-lavg: deps
+	pyinstaller -F client/unicornhat/quad-cpu-lavg.py -n statdis-client-unicornhat-quad-cpu-lavg
+
 server-basic-flask-install: ensure-root
 	install dist/statdis-server-basic-flask /usr/bin
 
 client-basic-cli-install: ensure-root
 	install dist/statdis-client-basic-cli /usr/bin
 
+client-unicornhat-single-cpu-lavg-install: ensure-root
+	install dist/statdis-client-unicornhat-single-cpu-lavg /usr/bin
+
+client-unicornhat-quad-cpu-lavg-install: ensure-root
+	install dist/statdis-client-unicornhat-quad-cpu-lavg /usr/bin
+
 server-basic-flask-uninstall: ensure-root
 	if [ ! $(which statdis-server-basic-flask) = "" ]; then rm $(which statdis-server-basic-flask); fi
 
 client-basic-cli-uninstall: ensure-root
-	if [ ! $(which statdis-basic-cli-uninstall) = "" ]; then rm $(which client-basic-cli-uninstall); fi
+	if [ ! $(which statdis-client-basic-cli) = "" ]; then rm $(which statdis-client-basic-cli); fi
+
+client-unicornhat-single-cpu-lavg-uninstall: ensure-root
+	if [ ! $(which statdis-unicornhat-single-cpu-lavg) = "" ]; then rm $(which statdis-client-unicornhat-single-cpu-lavg); fi
+
+client-unicornhat-quad-cpu-lavg-uninstall: ensure-root
+	if [ ! $(which statdis-unicornhat-quad-cpu-lavg) = "" ]; then rm $(which statdis-client-unicornhat-quad-cpu-lavg); fi
