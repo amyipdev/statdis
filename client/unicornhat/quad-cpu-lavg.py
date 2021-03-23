@@ -57,7 +57,7 @@ def update_quadrant(util: float, qn: int):
     unicornhat.show()
 
 if len(sys.argv) < 5:
-    print("error: please provide at least 5 hosts")
+    print("error: please provide at least 4 hosts")
 
 brightness = 0.5
 if len(sys.argv) == 6:
